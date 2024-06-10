@@ -33,20 +33,34 @@ const EmailAPI = 'http://localhost:8089/v1/api/user/email';
   return res;
 }; */
 
-// 验证快递员身份
+// validate deliverer and update order status
 const delivererVerification = async (value) => {
   try {
+    console.log(value);
+    console.log('value.serial', value.serial);
+
+    const data = {
+      serial: value.serial,
+      userAccountSerial: value.userAccountSerial,
+      deliverySerial: value.deliverySerial,
+    };
+    console.log('Sending data:', data);
     request(OrderUpdateCollectionAPI, {
       method: 'post',
-      data: {
-        account: value.account,
-        serial: value.serial,
-        userAccountSerial: value.userAccountSerial,
-        deliverySerial: value.deliverySerial,
-      },
-    }).then((res: any) => {
-      message.info(res.message);
+      data: data,
     });
+
+    // request(OrderUpdateCollectionAPI, {
+    //   method: 'post',
+    //   data: {
+    //     // account: value.account,
+    //     serial: value.serial,
+    //     userAccountSerial: value.userAccountSerial,
+    //     deliverySerial: value.deliverySerial,
+    //   },
+    // }).then((res: any) => {
+    //   message.info(res.message);
+    // });
 
     return true;
   } catch (error) {
@@ -308,8 +322,13 @@ export default function OrderManage() {
   // };
 
   const handleQrCode = (record) => {
-    console.log('record', record);
-    delivererVerification(record);
+    try {
+      const recordDoubleQuotes = record.replace(/'/g, '"');
+      const recordObject = JSON.parse(recordDoubleQuotes);
+      delivererVerification(recordObject);
+    } catch (error) {
+      console.error('Failed to parse record:', error);
+    }
   };
 
   return (
