@@ -1,6 +1,5 @@
 package ASE.deliverySpring.dao.impl;
 
-
 import ASE.deliverySpring.dao.BoxDao;
 import ASE.deliverySpring.entity.Box;
 import ASE.deliverySpring.entity.Product;
@@ -32,26 +31,26 @@ public class BoxDaoImpl implements BoxDao {
     public boolean delete(String serial) {
         Query query = new Query(Criteria.where("serial").is(serial));
 
-        long count = mongoTemplate.remove(query,Box.class).getDeletedCount();
+        long count = mongoTemplate.remove(query, Box.class).getDeletedCount();
 
-        return count==0 ? false : true;
+        return count == 0 ? false : true;
     }
+
     @Override
     public boolean update(Box box) {
-
         Query query = new Query(Criteria.where("serial").is(box.getSerial()));
 
-        Update update = Update.update("name",box.getName())
-                .set("id",box.getId())
-                .set("serial",box.getSerial())
-                .set("address",box.getAddress())
-                .set("status",box.getStatus())
-                .set("subTime",box.getSubTime());
+        Update update = new Update()
+                .set("name", box.getName())
+                .set("address", box.getAddress())
+                .set("status", box.getStatus())
+                .set("subTime", box.getSubTime());
 
-        long count = mongoTemplate.updateFirst(query,update,Product.class).getModifiedCount();
+        long count = mongoTemplate.updateFirst(query, update, Box.class).getMatchedCount();
 
-        return count==0 ? false : true;
+        System.out.println("count" + count);
 
+        return count != 0;
     }
 
     @Override
@@ -65,7 +64,7 @@ public class BoxDaoImpl implements BoxDao {
     public Box findBySerial(String serial) {
         Query query = new Query(Criteria.where("serial").is(serial));
 
-        Box box = mongoTemplate.findOne(query,Box.class);
+        Box box = mongoTemplate.findOne(query, Box.class);
 
         return box;
     }
@@ -75,11 +74,11 @@ public class BoxDaoImpl implements BoxDao {
 
         Query query = new Query(Criteria.where("serial").is(serial));
 
-        Update update = Update.update("status",status);
+        Update update = Update.update("status", status);
 
-        long count = mongoTemplate.updateFirst(query,update, Box.class).getModifiedCount();
+        long count = mongoTemplate.updateFirst(query, update, Box.class).getModifiedCount();
 
-        return count==0 ? false : true;
+        return count == 0 ? false : true;
 
     }
 
@@ -87,10 +86,9 @@ public class BoxDaoImpl implements BoxDao {
     public List<Box> findAllByAccount(List serials) {
         Query query = new Query(Criteria.where("serial").in(serials));
 
-        List<Box> boxes = mongoTemplate.find(query,Box.class);
+        List<Box> boxes = mongoTemplate.find(query, Box.class);
 
         return boxes;
     }
-
 
 }

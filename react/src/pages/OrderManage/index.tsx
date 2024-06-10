@@ -15,6 +15,7 @@ import { BoxInfo } from '@/types/box';
 import { useModel } from '@umijs/max';
 import { QrReader } from 'react-qr-reader';
 import QRcode from 'qrcode.react';
+import UploadQRCode from '@/components/DragAndDrop';
 
 const AccountAPI = 'http://localhost:8089/v1/api/user/find/all';
 const OrderAPI = 'http://localhost:8089/v1/api/order/find/all';
@@ -306,15 +307,21 @@ export default function OrderManage() {
   //   );
   // };
 
+  const handleQrCode = (record) => {
+    console.log('record', record);
+    delivererVerification(record);
+  };
+
   return (
     <div>
+      <UploadQRCode onQrCode={handleQrCode} />
       {startScan && (
         <QrReader
           onResult={(result, error) => {
             if (result) {
               try {
                 const a = JSON.parse(result.getText());
-                console.log(a);
+                console.log('aaa', a);
                 const orderForVeri = {
                   account: currentUser.account,
                   userAccountSerial: a['userAccountSerial'],
@@ -329,14 +336,15 @@ export default function OrderManage() {
             }
 
             if (error) {
-              console.info(error);
+              console.info('error!', error);
             }
           }}
-          containerStyle={{ width: '300px' }}
-          scanDelay={1000}
+          containerStyle={{ width: '300px', height: '300px' }}
+          scanDelay={3000}
           constraints={{ facingMode: 'user' }}
         />
       )}
+
       <QRcode
         id="1231"
         value="{'userAccountSerial':'1234','serial':'1231','deliverySerial':'123'}"

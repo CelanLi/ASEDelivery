@@ -21,7 +21,6 @@ const BoxRemoveAPI = 'http://localhost:8089/v1/api/box/remove';
 const BoxUpdateAPI = 'http://localhost:8089/v1/api/box/update/box';
 const BoxFindByAccountAPI = 'http://localhost:8089/v1/api/box/findAllByAccount';
 
-
 const BoxManage: React.FC<unknown> = () => {
   const TAG = 'Box';
   const access = useAccess();
@@ -33,90 +32,94 @@ const BoxManage: React.FC<unknown> = () => {
   const actionRef = useRef<ActionType>();
 
   // 查询list
-const handleQueryList = async (query: object) => {
-  let res;
-  if(access.dispatcher){
-    res = await request(BoxListAPI, {
-      query,
+  const handleQueryList = async (query: object) => {
+    let res;
+    if (access.dispatcher) {
+      res = await request(BoxListAPI, {
+        query,
       });
-  }else{
-    console.log(currentUser.account)
-    res = await request(BoxFindByAccountAPI, {
-      method: 'post',
-      data: { 
-        account: currentUser.account,
-      },
+    } else {
+      console.log('currentUser.account', currentUser.account);
+      res = await request(BoxFindByAccountAPI, {
+        method: 'post',
+        data: {
+          account: currentUser.account,
+        },
       });
-  }
-  return res;
-};
+      console.log('res', res);
+    }
+    return res;
+  };
 
-// 新增
-const handleAdd = async (value) => {
-  const hide = message.loading('Adding');
-  try {
-    request(BoxListAddAPI, {
-      method: 'post',
-      data: {
-        serial: value.serial,
-        name: value.name,
-        address: value.address,
-      },
-    }).then((res: any) => {
-      message.success(res.message);
-    })
-    return true;
-  } catch (error) {
-    hide();
-    message.error('Add failed please try again!');
-    return false;
-  }
-};
+  // 新增
+  const handleAdd = async (value) => {
+    const hide = message.loading('Adding');
+    try {
+      request(BoxListAddAPI, {
+        method: 'post',
+        data: {
+          serial: value.serial,
+          name: value.name,
+          address: value.address,
+        },
+      }).then((res: any) => {
+        message.success(res.message);
+      });
+      return true;
+    } catch (error) {
+      hide();
+      message.error('Add failed please try again!');
+      return false;
+    }
+  };
 
-// 更新
-const handleUpdate = async (value) => {
-  const hide = message.loading('update');
-  try {
-    request(BoxUpdateAPI, {
-      method: 'post',
-      data: {
-        serial: value.serial,
-        name: value.name,
-        address: value.address,
-      },
-    })
-    hide();
+  // 更新
+  const handleUpdate = async (value) => {
+    const hide = message.loading('update');
+    try {
+      let res = await request(BoxUpdateAPI, {
+        method: 'post',
+        data: {
+          serial: value.serial,
+          name: value.name,
+          address: value.address,
+          status: value.status,
+          id: value.id,
+          subTime: new Date().toISOString(),
+        },
+      });
+      hide();
+      console.log('res', res);
+      message.success('Update successfully');
+      return true;
+    } catch (error) {
+      hide();
+      message.error('Failed to update configuration please try again !！');
+      return false;
+    }
+  };
 
-    message.success('Update successfully');
-    return true;
-  } catch (error) {
-    hide();
-    message.error('Failed to update configuration please try again !！');
-    return false;
-  }
-};
-
-// delete
-const handleRemove = async (record) => {
-  const hide = message.loading('deleting');
-  try {
-    request(BoxRemoveAPI, {
-      method: 'post',
-      data: {
-        serial: record.serial,
-        name: record.name,
-        address: record.address,
-      },
-    })
-    hide();
-    message.success('Deleted successfully');
-    return true;
-  } catch (error) {
-    hide();
-    message.error('delete failed, please try again');
-    return false;
-  }
-};
+  // delete
+  const handleRemove = async (record) => {
+    const hide = message.loading('deleting');
+    try {
+      request(BoxRemoveAPI, {
+        method: 'post',
+        data: {
+          serial: record.serial,
+          name: record.name,
+          address: record.address,
+        },
+      });
+      hide();
+      message.success('Deleted successfully');
+      return true;
+    } catch (error) {
+      hide();
+      message.error('delete failed, please try again');
+      return false;
+    }
+  };
 
   const { initialState, setInitialState } = useModel('@@initialState');
   const { currentUser } = initialState || {};
@@ -154,12 +157,16 @@ const handleRemove = async (record) => {
             update
           </a>
           <Divider type="vertical" />
-          <a onClick={() => {
+          <a
+            onClick={() => {
               handleRemove(record);
               if (actionRef.current) {
                 actionRef.current.reload();
               }
-            }}>delete</a>
+            }}
+          >
+            delete
+          </a>
         </>
       ),
     },
