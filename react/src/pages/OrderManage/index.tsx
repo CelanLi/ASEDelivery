@@ -333,37 +333,6 @@ export default function OrderManage() {
 
   return (
     <div>
-      <UploadQRCode onQrCode={handleQrCode} />
-      {startScan && (
-        <QrReader
-          onResult={(result, error) => {
-            if (result) {
-              try {
-                const a = JSON.parse(result.getText());
-                console.log('aaa', a);
-                const orderForVeri = {
-                  account: currentUser.account,
-                  userAccountSerial: a['userAccountSerial'],
-                  serial: a['serial'],
-                  deliverySerial: a['deliverySerial'],
-                };
-                console.log(orderForVeri);
-                delivererVerification(orderForVeri);
-              } catch (error) {
-                console.error('Error parsing QR code data:', error);
-              }
-            }
-
-            if (error) {
-              console.info('error!', error);
-            }
-          }}
-          containerStyle={{ width: '300px', height: '300px' }}
-          scanDelay={3000}
-          constraints={{ facingMode: 'user' }}
-        />
-      )}
-
       <QRcode
         id="1231"
         value="{'userAccountSerial':'1234','serial':'1231','deliverySerial':'123'}"
@@ -390,16 +359,10 @@ export default function OrderManage() {
             >
               Create
             </Button>,
-            <Button
-              key="2"
-              type="primary"
+            <UploadQRCode
+              onQrCode={handleQrCode}
               style={access.deliverer ? {} : { display: 'none' }}
-              onClick={() => {
-                setStartScan(!startScan);
-              }}
-            >
-              {startScan ? 'Stop Scan' : 'Start QR-code Scan'}
-            </Button>,
+            />,
           ]}
           request={async (params, sorter, filter) => {
             const { data, success } = await handleQueryList({

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
+import { Button } from 'antd';
 import jsQR from 'jsqr';
 
-const UploadQRCode = ({ onQrCode }) => {
+const UploadQRCode = ({ onQrCode, style }) => {
   const [selectedFile, setSelectedFile] = useState();
   const [selectedFileName, setSelectedFileName] = useState('');
   const [uploaded, setUploaded] = useState(false);
@@ -46,15 +47,55 @@ const UploadQRCode = ({ onQrCode }) => {
   };
 
   return (
-    <div>
+    <div style={style}>
+      <label
+        htmlFor="fileUpload"
+        className="customFileSelect"
+        style={{
+          display: 'inline-block',
+          padding: '10px 20px',
+          backgroundColor: '#4CAF50',
+          color: 'white',
+          textAlign: 'center',
+          textDecoration: 'none',
+          fontSize: '16px',
+          margin: '4px 2px',
+          cursor: 'pointer',
+          border: 'none',
+          borderRadius: '4px',
+          transitionDuration: '0.4s',
+        }}
+      >
+        Select QR Code
+      </label>
       <input
+        id="fileUpload"
         type="file"
         accept=".png, .jpg, .jpeg"
         onChange={fileSelectedHandler}
+        style={{ display: 'none' }}
       />
-      <button onClick={fileUploadHandler}>Upload</button>
+      <label
+        className="customFileUpload"
+        style={{
+          display: 'inline-block',
+          padding: '10px 20px',
+          backgroundColor: '#4CAF50',
+          color: 'white',
+          textAlign: 'center',
+          textDecoration: 'none',
+          fontSize: '16px',
+          margin: '4px 2px',
+          cursor: 'pointer',
+          border: 'none',
+          borderRadius: '4px',
+          transitionDuration: '0.4s',
+        }}
+        onClick={fileUploadHandler}
+      >
+        Upload
+      </label>
       {selectedFileName && <p>{selectedFileName}</p>}
-      {qrCodeData && <p>QR Code Data: {qrCodeData}</p>}
     </div>
   );
 };
