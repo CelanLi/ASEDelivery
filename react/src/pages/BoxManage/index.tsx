@@ -12,7 +12,7 @@ import { Button, Divider, message } from 'antd';
 import React, { useRef, useState } from 'react';
 import BaseModal from '@/components/BaseModal';
 import { request, useAccess } from '@umijs/max';
-import { BoxInfo } from '@/types/box';
+import { BoxInfo, BoxOpenInfo } from '@/types/box';
 import { useModel } from '@umijs/max';
 
 const BoxListAPI = 'http://localhost:8089/v1/api/box/find/all';
@@ -20,6 +20,8 @@ const BoxListAddAPI = 'http://localhost:8089/v1/api/box/publish';
 const BoxRemoveAPI = 'http://localhost:8089/v1/api/box/remove';
 const BoxUpdateAPI = 'http://localhost:8089/v1/api/box/update/box';
 const BoxFindByAccountAPI = 'http://localhost:8089/v1/api/box/findAllByAccount';
+const BoxOpenAPI = 'http://localhost:8089/idAuthen';
+const BoxStatusAPI = 'http://localhost:8089/statusUpdate';
 
 const BoxManage: React.FC<unknown> = () => {
   const TAG = 'Box';
@@ -30,28 +32,19 @@ const BoxManage: React.FC<unknown> = () => {
     useState<boolean>(false);
   const [updateFormValue, setUpdateFormValue] = useState<BoxInfo>({});
   const actionRef = useRef<ActionType>();
+  const [boxOpen, setBoxOpen] = useState<boolean>(false);
+  const [boxOpenFormValue, setBoxOpenFormValue] = useState<BoxOpenInfo>({});
 
-  // 查询list
+  // get list
   const handleQueryList = async (query: object) => {
     let res;
-    if (access.dispatcher) {
-      res = await request(BoxListAPI, {
-        query,
-      });
-    } else {
-      console.log('currentUser.account', currentUser.account);
-      res = await request(BoxFindByAccountAPI, {
-        method: 'post',
-        data: {
-          account: currentUser.account,
-        },
-      });
-      console.log('res', res);
-    }
+    res = await request(BoxListAPI, {
+      query,
+    });
     return res;
   };
 
-  // 新增
+  // add
   const handleAdd = async (value) => {
     const hide = message.loading('Adding');
     try {
@@ -73,7 +66,7 @@ const BoxManage: React.FC<unknown> = () => {
     }
   };
 
-  // 更新
+  // update
   const handleUpdate = async (value) => {
     const hide = message.loading('update');
     try {
@@ -117,6 +110,41 @@ const BoxManage: React.FC<unknown> = () => {
     } catch (error) {
       hide();
       message.error('delete failed, please try again');
+      return false;
+    }
+  };
+
+  // open the box
+  const handleBoxOpen = async (value) => {
+    setBoxOpen(!boxOpen);
+    const hide = message.loading('update');
+    const data = {
+      boxSerial: value.boxSerial,
+      role: value.role,
+      rfid: value.rfid,
+    };
+    try {
+      // first authenticate, then open the box
+      let auth = await request(BoxOpenAPI, {
+        method: 'post',
+        data: data,
+      });
+      hide();
+      if (!auth) {
+        message.error('Authentication failed');
+        return false;
+      }
+      message.success('Authentication successfully');
+
+      let res = await request(BoxStatusAPI, {
+        method: 'post',
+        data: data,
+      });
+      message.success('Open the box successfully');
+      return true;
+    } catch (error) {
+      hide();
+      message.error('Failed to update configuration please try again !！');
       return false;
     }
   };
@@ -206,7 +234,8 @@ const BoxManage: React.FC<unknown> = () => {
         }}
         columns={columns}
       />
-      {/* 创建 */}
+      <Button onClick={() => setBoxOpen(!boxOpen)}>Open box</Button>
+      {/* create */}
       <BaseModal
         onCancel={() => handleCreateModalVisible(false)}
         modalVisible={createModalVisible}
@@ -226,7 +255,7 @@ const BoxManage: React.FC<unknown> = () => {
           columns={columns}
         />
       </BaseModal>
-      {/* 更新title */}
+      {/* update title */}
       <BaseModal
         onCancel={() => {
           handleUpdateModalVisible(false);
@@ -263,6 +292,37 @@ const BoxManage: React.FC<unknown> = () => {
           <ProFormText width="md" name="name" label="Name" />
           <ProFormText width="md" name="status" label="Status" />
           <ProFormText width="md" name="address" label="Address" />
+        </ProForm>
+      </BaseModal>
+      {/* open the box */}
+      <BaseModal
+        onCancel={() => {
+          setBoxOpen(false);
+          setBoxOpenFormValue({});
+        }}
+        modalVisible={boxOpen}
+      >
+        <ProForm
+          submitter={{
+            searchConfig: {
+              resetText: 'Cancel',
+              submitText: 'Submit',
+            },
+          }}
+          onFinish={async (value) => {
+            handleBoxOpen(value);
+            if (actionRef.current) {
+              actionRef.current.reload();
+            }
+          }}
+          onReset={() => {
+            setBoxOpen(false);
+            setBoxOpenFormValue({});
+          }}
+        >
+          <ProFormText width="md" name="boxSerial" label="BoxSerial" />
+          <ProFormText width="md" name="role" label="Role" />
+          <ProFormText width="md" name="rfid" label="Rfid" />
         </ProForm>
       </BaseModal>
     </PageContainer>

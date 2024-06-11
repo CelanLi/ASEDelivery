@@ -452,11 +452,6 @@ export default function OrderManage() {
           </ProForm>
         </BaseModal>
       </PageContainer>
-      {/* {startScan && ( */}
-
-      {/* )} */}
-      {/* {data !== "" && <p>{data}</p>} */}
-      {/* {dataJson !== "" && <p>{dataJson["account"]}</p>} */}
     </div>
   );
 }

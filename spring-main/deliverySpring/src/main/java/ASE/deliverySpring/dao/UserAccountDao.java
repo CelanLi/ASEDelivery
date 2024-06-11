@@ -9,27 +9,26 @@ import java.util.List;
  *
  * @author
  * @version 1.0
- * 版权所有：
+ *          版权所有：
  * @className UserAccountDao
  * @projectName deliverySpring
  * @date 2022/12/2
  */
 public interface UserAccountDao {
 
-     boolean save(UserAccount userAccount);
+    boolean save(UserAccount userAccount);
 
-     boolean delete(String serial);
+    boolean delete(String serial);
 
-     List<UserAccount> findAll();
+    List<UserAccount> findAll();
 
-     boolean update(UserAccount userAccount);
+    boolean update(UserAccount userAccount);
 
-     UserAccount findBySerial(String serial);
+    UserAccount findBySerial(String serial);
 
     UserAccount findByRfid(String serial);
 
     UserAccount findByPwd(String account, String password);
-
 
     UserAccount findByAccount(String account);
 }
