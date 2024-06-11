@@ -2,7 +2,6 @@ package ASE.deliverySpring.dao.impl;
 
 import ASE.deliverySpring.dao.BoxDao;
 import ASE.deliverySpring.entity.Box;
-import ASE.deliverySpring.entity.Product;
 import ASE.deliverySpring.utils.DataUtil;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;

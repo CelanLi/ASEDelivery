@@ -1,5 +1,9 @@
 // import { outLogin } from '@/services/ant-design-pro/api';
-import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
+import {
+  LogoutOutlined,
+  SettingOutlined,
+  UserOutlined,
+} from '@ant-design/icons';
 import { useEmotionCss } from '@ant-design/use-emotion-css';
 import { history, useModel } from '@umijs/max';
 import { Avatar, Spin } from 'antd';
@@ -34,7 +38,9 @@ const Name = () => {
     };
   });
 
-  return <span className={`${nameClassName} anticon`}>{currentUser?.realName}</span>;
+  return (
+    <span className={`${nameClassName} anticon`}>{currentUser?.realName}</span>
+  );
 };
 
 const AvatarLogo = () => {
@@ -53,25 +59,32 @@ const AvatarLogo = () => {
     };
   });
 
-  return <Avatar size="small" className={avatarClassName} src={currentUser?.avatar} alt="avatar" />;
+  return (
+    <Avatar
+      size="small"
+      className={avatarClassName}
+      src={currentUser?.avatar}
+      alt="avatar"
+    />
+  );
 };
 
 const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu }) => {
   const { initialState, setInitialState } = useModel('@@initialState');
-  console.log('initialState1:', initialState)
+  console.log('initialState1:', initialState);
 
   /**
    * 退出登录
    */
   const loginOut = async () => {
-      console.log('tuichu')
-      setInitialState((base: { currentUser: any }) => ({
-        ...base,
-        currentUser: null,
-        name: null,
-        avatar: null,
-      }));
-      history.replace(loginPath);
+    console.log('tuichu');
+    setInitialState((base: { currentUser: any }) => ({
+      ...base,
+      currentUser: null,
+      name: null,
+      avatar: null,
+    }));
+    history.replace(loginPath);
   };
   const actionClassName = useEmotionCss(() => {
     return {
@@ -121,7 +134,7 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu }) => {
 
   const { currentUser } = initialState;
 
-  console.log('currentUser:', currentUser)
+  console.log('currentUser:', currentUser);
 
   if (!currentUser || !currentUser.realName) {
     return loading;
@@ -144,7 +157,7 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu }) => {
       }}
     >
       <span className={actionClassName}>
-        <AvatarLogo /> 
+        <AvatarLogo />
         <Name />
       </span>
     </HeaderDropdown>
