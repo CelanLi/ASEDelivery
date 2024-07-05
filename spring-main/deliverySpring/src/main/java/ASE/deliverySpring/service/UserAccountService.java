@@ -68,7 +68,7 @@ public class UserAccountService {
     }
 
     /**
-     * 按账号密码查询
+     * search by account and password
      * @param account /
      * @param password /
      * @return /

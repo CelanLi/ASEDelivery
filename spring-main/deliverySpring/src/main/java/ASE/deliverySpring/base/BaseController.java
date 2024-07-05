@@ -1,6 +1,9 @@
 package ASE.deliverySpring.base;
 
 import ASE.deliverySpring.service.*;
+import ASE.deliverySpring.utils.JWT;
+import org.slf4j.helpers.Util;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
@@ -42,6 +45,9 @@ public class BaseController {
 
     @Resource
     protected OrderService orderService;
+
+    @Autowired
+    protected JWT jwt;
 
     public HttpSession getSession() {
         return getRequest().getSession();

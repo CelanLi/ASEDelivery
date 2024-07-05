@@ -28,87 +28,46 @@ import java.util.List;
 public class ProductController extends BaseController {
 
     /**
-     * 货物列表查询
+     * get all products list
      * @return /
      */
     @GetMapping("/find/all")
     public Result findAll(){
-
-        try{
-
             List<Product> products = productService.findAll();
-
-            return Result.success("查询成功",products);
-
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-
-        return Result.error(BaseMessage.服务器内部错误请联系管理员.name());
+            return Result.success("success",products);
     }
 
     /**
-     * 保存货物
-     * @param product 货物对象
+     * save or update product
+     * @param product
      * @return
      */
     @PostMapping("/publish")
     public Result publish(Product product){
-
-        try{
-
-
-            if (StringUtils.isEmpty(product.getSerial())){
-
-                product.setSerial(DataUtil.getComSerial());
-
-                return productService.save(product) ? Result.success("新增成功") : Result.error("新增失败");
-
-
-            }else {
-
-                Product dest = productService.findBySerial(product.getSerial());
-
-                if (dest == null){
-                    return Result.error("当前用户信息不存在");
-                }
-
-
-                return productService.update(product) ? Result.success("修改成功") : Result.error("修改失败");
-
+        if (StringUtils.isEmpty(product.getSerial())){
+            product.setSerial(DataUtil.getComSerial());
+            return productService.save(product) ? Result.success("Added Successfully!") : Result.error("Failed!");
+        }else {
+            Product dest = productService.findBySerial(product.getSerial());
+            if (dest == null){
+                return Result.error("Product doesn't exists!");
             }
-        }catch (Exception e){
-            e.printStackTrace();
+            return productService.update(product) ? Result.success("Update successfully!") : Result.error("Update failed!");
         }
-
-        return Result.error(BaseMessage.服务器内部错误请联系管理员.name());
     }
 
     /**
-     * 删除货物
-     * @param serial 货物唯一编号
+     * delete product
+     * @param serial serial of product
      * @return
      */
     @GetMapping("/remove")
     public Result remove(@RequestParam("serial") String serial){
-
-        try{
-
             Product product = productService.findBySerial(serial);
-
             if (product == null){
-                return Result.error("当前用户不存在");
+                return Result.error("Product doesn't exist!");
             }
-
-            return productService.remove(serial) ? Result.success("删除成功") : Result.error("删除失败");
-
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-
-        return Result.error(BaseMessage.服务器内部错误请联系管理员.name());
-
+            return productService.remove(serial) ? Result.success("Deleted successfully!") : Result.error("Deleted failed!");
     }
-
 
 }

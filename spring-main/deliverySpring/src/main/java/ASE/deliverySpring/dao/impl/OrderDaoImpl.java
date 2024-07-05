@@ -195,7 +195,6 @@ public class OrderDaoImpl implements OrderDao {
     }
     @Override
     public  List<Order> findByBoxSerialAndStatus(String boxSerial){
-
         Criteria criteria=new Criteria();
         criteria.andOperator(Criteria.where("status").ne("picked"),
                 Criteria.where("boxSerial").is(boxSerial));

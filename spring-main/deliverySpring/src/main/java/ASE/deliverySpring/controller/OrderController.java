@@ -36,32 +36,22 @@ public class OrderController extends BaseController {
     @RequestMapping("/publish")
     public Result publish(@RequestBody Order order) {
 
-        try {
-            order.setStatus("delivering");
-            // order.setSerial(DataUtil.getComSerial());
-            if (orderService.findBySerial(order.getSerial()) != null) {
-                return Result.error("The serial already exists, please choose another one.");
-            }
-
-            else if (!legitimacyTest.customerUniquenessTest(order)) {
-                return Result.error("The box is allocated,please choose another one.");
-            }
-
-            else if (orderService.save(order)) {
-                emailService.orderCreationMail(order);
-                return Result.success("order placing successfully");
-
-            } else {
-                return Result.error("order placing failed");
-            }
-            // return orderService.save(order) ? Result.success("下单成功") :
-            // Result.error("下单失败");
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        order.setStatus("delivering");
+        if (orderService.findBySerial(order.getSerial()) != null) {
+            return Result.error("The serial already exists, please choose another one.");
         }
 
-        return Result.error(BaseMessage.服务器内部错误请联系管理员.name());
+        else if (!legitimacyTest.customerUniquenessTest(order)) {
+            return Result.error("The box is allocated,please choose another one.");
+        }
+
+        else if (orderService.save(order)) {
+            emailService.orderCreationMail(order);
+            return Result.success("order placing successfully");
+
+        } else {
+            return Result.error("order placing failed");
+        }
 
     }
 
@@ -74,22 +64,14 @@ public class OrderController extends BaseController {
     @RequestMapping("/remove")
     public Result remove(@RequestBody Order requestOrder) {
 
-        try {
+        Order order = orderService.findBySerial(requestOrder.getSerial());
 
-            Order order = orderService.findBySerial(requestOrder.getSerial());
-
-            if (order == null) {
-                return Result.error("this order does not exists");
-            }
-
-            return orderService.remove(requestOrder.getSerial()) ? Result.success("successful delete")
-                    : Result.error("failed delete");
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (order == null) {
+            return Result.error("this order does not exists");
         }
 
-        return Result.error(BaseMessage.服务器内部错误请联系管理员.name());
+        return orderService.remove(requestOrder.getSerial()) ? Result.success("successful delete")
+                : Result.error("failed delete");
 
     }
 
@@ -100,22 +82,8 @@ public class OrderController extends BaseController {
      */
     @RequestMapping("/find/all")
     public Result findAll() {
-
-        try {
-
-            List<Order> orders = orderService.findAll();
-
-            // orders.forEach(item ->{
-            // Product product = productService.findBySerial(item.getProductSerial());
-            // item.setProduct(product);
-            // });
-            return Result.success("successful query", orders);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return Result.error(BaseMessage.服务器内部错误请联系管理员.name());
+        List<Order> orders = orderService.findAll();
+        return Result.success("successful query", orders);
     }
 
     /**
@@ -126,24 +94,14 @@ public class OrderController extends BaseController {
      */
     @RequestMapping("/update/delivery")
     public Result update(@RequestBody Order requestOrder) {
+        Order order = orderService.findBySerial(requestOrder.getSerial());
 
-        try {
-
-            Order order = orderService.findBySerial(requestOrder.getSerial());
-
-            if (order == null) {
-                return Result.error("This order does not exists");
-            }
-
-            return orderService.update(requestOrder) ? Result.success("successful update")
-                    : Result.error("failed update");
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (order == null) {
+            return Result.error("This order does not exists");
         }
 
-        return Result.error(BaseMessage.服务器内部错误请联系管理员.name());
-
+        return orderService.update(requestOrder) ? Result.success("successful update")
+                : Result.error("failed update");
     }
 
     // /**
@@ -178,65 +136,33 @@ public class OrderController extends BaseController {
     @CrossOrigin
     @RequestMapping("/update/status_collection")
     public Result updatStatusWhenCollecting(@RequestBody Order requestOrder) {
-        try {
-            Order order = orderService.findBySerial(requestOrder.getSerial());
-            System.out.println("order" + order);
-            order.setStatus("delivering");
-            if (orderService.update(order)) {
-                emailService.deliveryCollectionMail(order);
-                return Result.success("successful status update");
-            }
-
-            else {
-                return Result.error("failed status update");
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        Order order = orderService.findBySerial(requestOrder.getSerial());
+        order.setStatus("delivering");
+        if (orderService.update(order)) {
+            emailService.deliveryCollectionMail(order);
+            return Result.success("successful status update");
         }
-
-        return Result.error(BaseMessage.服务器内部错误请联系管理员.name());
-
+        else {
+            return Result.error("failed status update");
+        }
     }
 
     @RequestMapping("/findBySerial")
     public Result findBySerial(@RequestBody Order requestOrder) {
         Order order = orderService.findBySerial(requestOrder.getSerial());
-        try {
-            if (order == null) {
-                return Result.error("This order does not exists");
-
-            }
-
-            else {
-                return Result.success("successful query", order);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (order == null) {
+            return Result.error("This order does not exists");
         }
-
-        return Result.error(BaseMessage.服务器内部错误请联系管理员.name());
+        else {
+            return Result.success("successful query", order);
+        }
     }
 
     @RequestMapping("/findAllByAccount")
     public Result findAllByAccount(@RequestBody UserAccount userAccount) {
-
-        try {
-            UserAccount account = userAccountService.findByAccount(userAccount.getAccount());
-            List<Order> orders = orderService.findByUser(account.getSerial(), account.getRole());
-
-            // orders.forEach(item ->{
-            // Product product = productService.findBySerial(item.getProductSerial());
-            // item.setProduct(product);
-            // });
-            return Result.success("successful query", orders);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return Result.error(BaseMessage.服务器内部错误请联系管理员.name());
+        UserAccount account = userAccountService.findByAccount(userAccount.getAccount());
+        List<Order> orders = orderService.findByUser(account.getSerial(), account.getRole());
+        return Result.success("successful query", orders);
     }
 
 }

@@ -24,17 +24,6 @@ export default function () {
   const { setInitialState } = useModel('@@initialState');
 
   async function submit() {
-    
-
-    // setInitialState((s: any) => ({
-    //   ...s,
-    //   currentUser: userInfo,
-    //   name: userInfo.name,
-    //   avatar: userInfo.avatar,
-    // }));
-    // setTimeout(() => {
-    //   history.push(pathMap[userInfo.role]);
-    // }, 10);
 
     if (!account || !password) {
       message.error("Please enter the account password")
@@ -53,6 +42,9 @@ export default function () {
       .then((res: any) => {
         console.log('res:', res);
         if(res.message === "login"){
+          // store the jwt in local storage
+          // localStorage.setItem("token",res.data);
+
           const { realName, email, account, role  } = res.data;
           setInitialState((s: any) => ({
             ...s,

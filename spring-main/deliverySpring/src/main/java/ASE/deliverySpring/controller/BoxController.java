@@ -17,125 +17,73 @@ import java.util.List;
 @RestController
 @RequestMapping("/v1/api/box")
 public class BoxController extends BaseController {
+
     /**
-     * box列表查询
+     * get all boxes
      * 
      * @return /
      */
     @RequestMapping("/find/all")
     public Result findAll() {
-
-        try {
-
-            List<Box> boxs = boxService.findAll();
-
-            return Result.success("successful query", boxs);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return Result.error(BaseMessage.服务器内部错误请联系管理员.name());
+        List<Box> boxs = boxService.findAll();
+        return Result.success("successful query", boxs);
     }
 
     /**
-     * 保存box
+     * save box
      * 
-     * @param box box对象
+     * @param box
      * @return
      */
     @RequestMapping("/publish")
     public Result publish(@RequestBody Box box) {
-
-        try {
-
-            box.setStatus("free");
-            if (boxService.findBySerial(box.getSerial()) != null) {
-
-                return Result.error("This serial already exists!");
-
-            } else {
-
-                return boxService.save(box) ? Result.success("successful creation") : Result.error("failed creation");
-
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        box.setStatus("free");
+        if (boxService.findBySerial(box.getSerial()) != null) {
+            return Result.error("This serial already exists!");
+        } else {
+            return boxService.save(box) ? Result.success("successful creation") : Result.error("failed creation");
         }
-
-        return Result.error(BaseMessage.服务器内部错误请联系管理员.name());
     }
 
     @RequestMapping("/update/box")
     public Result update(@RequestBody Box box) {
-        System.out.println("box" + box);
-        try {
-
-            boxService.update(box);
-
-            // Order order = orderService.findBySerial(box.getSerial());
-
-            // if (order == null) {
-            // return Result.error("This box does not exists.");
-            // }
-
-            return boxService.update(box) ? Result.success("successful update") : Result.error("failed update");
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return Result.error(BaseMessage.服务器内部错误请联系管理员.name());
-
+        boxService.update(box);
+        return boxService.update(box) ? Result.success("successful update") : Result.error("failed update");
     }
 
     /**
-     * 删除box
+     * delete box
      * 
-     * @param requestBox box唯一编号
+     * @param requestBox serial of box
      * @return
      */
     @RequestMapping("/remove")
     public Result remove(@RequestBody Box requestBox) {
-
-        try {
-
-            Box box = boxService.findBySerial(requestBox.getSerial());
-
-            if (box == null) {
-                return Result.error("the box does not exists");
-            }
-
-            return boxService.remove(requestBox.getSerial()) ? Result.success("delete successfully")
-                    : Result.error("failed delete");
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        Box box = boxService.findBySerial(requestBox.getSerial());
+        if (box == null) {
+            return Result.error("the box does not exists");
         }
-
-        return Result.error(BaseMessage.服务器内部错误请联系管理员.name());
-
+        return boxService.remove(requestBox.getSerial()) ? Result.success("delete successfully")
+                : Result.error("failed delete");
     }
 
+    /**
+     * get all boxes occupied by one user account
+     *
+     * @param userAccount
+     * @return
+     */
     @RequestMapping("/findAllByAccount")
     public Result findAllByAccount(@RequestBody UserAccount userAccount) {
-        System.out.println("userAccount:" + userAccount.getSerial());
-        List<String> serials = new ArrayList<String>();
+        List<String> serials = new ArrayList<>();
 
-        try {
-            List<Order> orders = orderService.findByUser(userAccount.getSerial(), userAccount.getRole());
+        List<Order> orders = orderService.findByUser(userAccount.getSerial(), userAccount.getRole());
 
-            orders.forEach(item -> {
-                String serial = item.getBoxSerial();
-                serials.add(serial);
-            });
+        orders.forEach(item -> {
+            String serial = item.getBoxSerial();
+            serials.add(serial);
+        });
 
-            return Result.success("successful query", boxService.findAllByAccount(serials));
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return Result.error(BaseMessage.服务器内部错误请联系管理员.name());
+        return Result.success("successful query", boxService.findAllByAccount(serials));
     }
 }

@@ -95,4 +95,9 @@ public class TestController extends BaseController {
         return Result.error(BaseMessage.服务器内部错误请联系管理员.name());
 
     }
+
+    @PostMapping("/testException")
+    public Result exceptionTest(@RequestBody UserAccount userAccount){
+        throw new RuntimeException("测试全局异常处理程序");
+    }
 }

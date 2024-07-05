@@ -50,18 +50,6 @@ const delivererVerification = async (value) => {
       data: data,
     });
 
-    // request(OrderUpdateCollectionAPI, {
-    //   method: 'post',
-    //   data: {
-    //     // account: value.account,
-    //     serial: value.serial,
-    //     userAccountSerial: value.userAccountSerial,
-    //     deliverySerial: value.deliverySerial,
-    //   },
-    // }).then((res: any) => {
-    //   message.info(res.message);
-    // });
-
     return true;
   } catch (error) {
     message.error('Failed,please try again !！');
